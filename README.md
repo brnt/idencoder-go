@@ -7,7 +7,7 @@ package main
 
 import (
     "fmt"
-	"github.com/brnt/idencoder-go/idencoder"
+    "github.com/brnt/idencoder-go/idencoder"
 )
 
 alpha := "tvy7fuk4g59d6b3mhc8jqwrzexspan2"
