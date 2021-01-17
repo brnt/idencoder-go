@@ -45,12 +45,21 @@ URL: https://github.com/brnt/idencoder
 Repo: https://github.com/brnt/idencoder-go
 
 */
-package main
+package idencoder
 
 import (
 	"bytes"
 	"fmt"
 )
+
+// Alphabet is a set of characters to be used in an encoded value
+type Alphabet []byte
+
+// BlockSize determines how many bits will be shuffled
+type BlockSize uint64
+
+//
+type Checksum uint64
 
 // Default values for encoder/decoders
 const (
@@ -66,60 +75,60 @@ const (
 
 // IDEncoder contains the various values for an encoder/decoder.
 type IDEncoder struct {
-	alphabet  []byte
-	blockSize uint64
-	modulus   uint64
+	Alphabet  Alphabet
+	BlockSize BlockSize
+	Checksum  Checksum
 }
 
 // Encode converts an integer to a unique string, using the parameters contianed in the IDEncoder
-func (i *IDEncoder) Encode(n, minLength uint64) (string, bool) {
+func (i *IDEncoder) Encode(n, minLength uint64) (encoded string, ok bool) {
 
-	return string(i.checksum(n)) + i.enbase(i.scramble(n), minLength), false
+	return string(i.checksum(n)) + i.enbase(i.scramble(n), minLength), true
 }
 
 // Decode converts an string to an integer, using the parameters contianed in the IDEncoder
-func (i *IDEncoder) Decode(s string) (uint64, bool) {
+func (i *IDEncoder) Decode(s string) (decoded uint64, ok bool) {
 	b := []byte(s)
 	value := i.scramble((i.debase(b[1:])))
-	err := false
+	err := true
 	if i.checksum(value) != b[0] {
-		err = true
+		err = false
 	}
 	return value, err
 }
 
 func (i *IDEncoder) checksum(n uint64) byte {
-	return i.alphabet[n%i.modulus]
+	return i.Alphabet[n%uint64(i.Checksum)]
 }
 
 func (i *IDEncoder) scramble(n uint64) uint64 {
-	mask := uint64((1 << i.blockSize) - 1)
+	mask := uint64((1 << i.BlockSize) - 1)
 	result := n & ^mask
-	for bit := uint64(0); bit < i.blockSize; bit++ {
+	for bit := uint64(0); bit < uint64(i.BlockSize); bit++ {
 		if n&(1<<bit) != 0 {
-			result |= 1 << (i.blockSize - bit - 1)
+			result |= 1 << (uint64(i.BlockSize) - bit - 1)
 		}
 	}
 	return result
 }
 
 func (i *IDEncoder) enbase(x, minLength uint64) string {
-	n := uint64(len(i.alphabet))
+	n := uint64(len(i.Alphabet))
 	chars := []byte{}
 	for x > 0 {
 		c := x % n
 		x = uint64(x / n)
-		chars = append([]byte{i.alphabet[c]}, chars...)
+		chars = append([]byte{i.Alphabet[c]}, chars...)
 	}
-	return leftPad(string(chars), minLength, i.alphabet[0])
+	return leftPad(string(chars), minLength, i.Alphabet[0])
 }
 
 func (i *IDEncoder) debase(x []byte) uint64 {
 	result := uint64(0)
-	n := uint64(len(i.alphabet))
+	n := uint64(len(i.Alphabet))
 	for _, val := range x {
 		result *= n
-		result += uint64(bytes.IndexByte(i.alphabet, val))
+		result += uint64(bytes.IndexByte(i.Alphabet, val))
 	}
 	return result
 }
