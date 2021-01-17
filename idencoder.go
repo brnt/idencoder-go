@@ -1,3 +1,50 @@
+/*
+Integer ID Encoder
+===================
+
+Golang implementation for encoding (usually sequential) integer IDs.
+
+## Algorithm details
+
+A bit-shuffling approach is used to avoid generating consecutive, predictable
+values. However, the algorithm is deterministic and will guarantee that no
+collisions will occur.
+
+The encoding alphabet is fully customizable and may contain any number of
+characters. By default, digits and lower-case letters are used, with some
+characters removed to avoid confusion between characters like o, O and 0. The
+default alphabet is shuffled and has a prime number of characters to further
+improve the results of the algorithm.
+
+The block size specifies how many bits will be shuffled. The lower `blockSize`
+bits are reversed. Any bits higher than `blockSize` will remain as is.
+`blockSize` of 0 will leave all bits unaffected and the algorithm will simply
+be converting your integer to a different base.
+
+## Common usage
+
+The intended use is that incrementing, consecutive integers will be used as
+keys to generate the encoded IDs. For example, to create a new short URL (à la
+bit.ly), the unique integer ID assigned by a database could be used to generate
+the last portion of the URL by using this module. Or a simple counter may be
+used. As long as the same integer is not used twice, the same encoded value
+will not be generated twice.
+
+The module supports both encoding and decoding of values. The `minLength`
+parameter allows you to pad the encoded value if you want it to be a specific
+length.
+
+Provenance:
+
+Original Author (Python): [Michael Fogleman](http://code.activestate.com/recipes/576918/)
+License: [MIT](https://opensource.org/licenses/MIT)
+
+Modified Python version from which this version is ported
+URL: https://github.com/brnt/idencoder
+
+Repo: https://github.com/brnt/idencoder-go
+
+*/
 package main
 
 import (
