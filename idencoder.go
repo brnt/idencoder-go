@@ -7,6 +7,10 @@ import (
 
 // Default values for encoder/decoders
 const (
+	// DefaultAlphabet SHOULD NOT be used in production!!! This value
+	// can/will change at any time, which will break links to any URLs
+	// with encoded IDs in them. Instead, create your own alphabets,
+	// perhaps using the idencoder.RandomAlphabet() function.
 	DefaultAlphabet  = "3fq4rv5z7hsdamn8bpygw96j2cetxuk"
 	DefaultBlockSize = 24
 	DefaultChecksum  = 29
