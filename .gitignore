@@ -1,5 +1,6 @@
 # Project specific stuff
 idencoder-go
+idencoder.code-workspace
 
 # Environment stuff
 .env
