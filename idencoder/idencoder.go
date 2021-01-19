@@ -1,8 +1,5 @@
 /*
-Integer ID Encoder
-===================
-
-Golang implementation for encoding (usually sequential) integer IDs.
+Package idencoder is a Golang implementation for encoding (usually sequential) integer IDs.
 
 ## Algorithm details
 
@@ -23,6 +20,8 @@ be converting your integer to a different base.
 
 ## Common usage
 
+### URL shortening & obfuscation
+
 The intended use is that incrementing, consecutive integers will be used as
 keys to generate the encoded IDs. For example, to create a new short URL (à la
 bit.ly), the unique integer ID assigned by a database could be used to generate
@@ -34,7 +33,7 @@ The module supports both encoding and decoding of values. The `minLength`
 parameter allows you to pad the encoded value if you want it to be a specific
 length.
 
-Provenance:
+## Provenance
 
 Original Author (Python): [Michael Fogleman](http://code.activestate.com/recipes/576918/)
 License: [MIT](https://opensource.org/licenses/MIT)
@@ -43,6 +42,7 @@ Modified Python version from which this version is ported
 URL: https://github.com/brnt/idencoder
 
 Repo: https://github.com/brnt/idencoder-go
+
 
 */
 package idencoder
