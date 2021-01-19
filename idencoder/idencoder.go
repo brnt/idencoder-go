@@ -13,9 +13,9 @@ characters removed to avoid confusion between characters like o, O and 0. The
 default alphabet is shuffled and has a prime number of characters to further
 improve the results of the algorithm.
 
-The block size specifies how many bits will be shuffled. The lower `blockSize`
-bits are reversed. Any bits higher than `blockSize` will remain as is.
-`blockSize` of 0 will leave all bits unaffected and the algorithm will simply
+The block size specifies how many bits will be shuffled. The lower `BlockSize`
+bits are reversed. Any bits higher than `BlockSize` will remain as is.
+`BlockSize` of 0 will leave all bits unaffected and the algorithm will simply
 be converting your integer to a different base.
 
 ## Common usage
@@ -58,7 +58,7 @@ type Alphabet []byte
 // BlockSize determines how many bits will be shuffled
 type BlockSize uint64
 
-//
+// Checksum validates scramble/unscramble sub-operations
 type Checksum uint64
 
 // Default values for encoder/decoders
