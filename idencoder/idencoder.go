@@ -61,6 +61,10 @@ type BlockSize uint64
 // Checksum validates scramble/unscramble sub-operations
 type Checksum uint64
 
+type IdEncoderError struct {
+	Message string
+}
+
 // Default values for encoder/decoders
 const (
 	// DefaultAlphabet SHOULD NOT be used in production!!! This value
@@ -73,35 +77,40 @@ const (
 	MinLength        = 5
 )
 
-// IDEncoder contains the various values for an encoder/decoder.
-type IDEncoder struct {
+// IdEncoder contains the various values for an encoder/decoder.
+type IdEncoder struct {
 	Alphabet  Alphabet
 	BlockSize BlockSize
 	Checksum  Checksum
 }
 
-// Encode converts an integer to a unique string, using the parameters contianed in the IDEncoder
-func (i *IDEncoder) Encode(n, minLength uint64) (encoded string, ok bool) {
-
-	return string(i.checksum(n)) + i.enbase(i.scramble(n), minLength), true
+func (e *IdEncoderError) Error() string {
+	return fmt.Sprintf("IdEncoder error: %s", e.Message)
 }
 
-// Decode converts an string to an integer, using the parameters contianed in the IDEncoder
-func (i *IDEncoder) Decode(s string) (decoded uint64, ok bool) {
+// Encode converts an integer to a unique string, using the parameters contianed in the IdEncoder
+func (i *IdEncoder) Encode(n, minLength uint64) (encoded string, err error) {
+
+	return string(i.checksum(n)) + i.enbase(i.scramble(n), minLength), nil
+}
+
+// Decode converts an string to an integer, using the parameters contianed in the IdEncoder
+func (i *IdEncoder) Decode(s string) (decoded uint64, err error) {
 	b := []byte(s)
 	value := i.scramble((i.debase(b[1:])))
-	err := true
 	if i.checksum(value) != b[0] {
-		err = false
+		err = &IdEncoderError{
+			Message: "Error decoding",
+		}
 	}
 	return value, err
 }
 
-func (i *IDEncoder) checksum(n uint64) byte {
+func (i *IdEncoder) checksum(n uint64) byte {
 	return i.Alphabet[n%uint64(i.Checksum)]
 }
 
-func (i *IDEncoder) scramble(n uint64) uint64 {
+func (i *IdEncoder) scramble(n uint64) uint64 {
 	mask := uint64((1 << i.BlockSize) - 1)
 	result := n & ^mask
 	for bit := uint64(0); bit < uint64(i.BlockSize); bit++ {
@@ -112,7 +121,7 @@ func (i *IDEncoder) scramble(n uint64) uint64 {
 	return result
 }
 
-func (i *IDEncoder) enbase(x, minLength uint64) string {
+func (i *IdEncoder) enbase(x, minLength uint64) string {
 	n := uint64(len(i.Alphabet))
 	chars := []byte{}
 	for x > 0 {
@@ -123,7 +132,7 @@ func (i *IDEncoder) enbase(x, minLength uint64) string {
 	return leftPad(string(chars), minLength, i.Alphabet[0])
 }
 
-func (i *IDEncoder) debase(x []byte) uint64 {
+func (i *IdEncoder) debase(x []byte) uint64 {
 	result := uint64(0)
 	n := uint64(len(i.Alphabet))
 	for _, val := range x {

@@ -72,31 +72,35 @@ func main() {
 		return
 	}
 
-	ie := idencoder.IDEncoder{
+	ie := idencoder.IdEncoder{
 		Alphabet:  []byte(*alphabet),
 		BlockSize: idencoder.DefaultBlockSize,
 		Checksum:  idencoder.DefaultChecksum,
 	}
 	switch true {
 	case *encode > 0:
-		encoded, ok := ie.Encode(uint64(*encode), uint64(*length))
-		if !ok {
+		encoded, err := ie.Encode(uint64(*encode), uint64(*length))
+		if err != nil {
 			fmt.Println("**ERROR** during encode")
 		}
 		fmt.Println(encoded)
 	case len(*decode) >= *length:
-		decoded, ok := ie.Decode(*decode)
-		if !ok {
+		decoded, err := ie.Decode(*decode)
+		if err != nil {
 			fmt.Println("**ERROR** during decode")
 		}
 		fmt.Println(decoded)
 	case *benchmark > 0:
 		start := time.Now().UnixNano()
 		for i := uint64(0); i < uint64(*benchmark); i++ {
-			encoded, ok := ie.Encode(i, idencoder.MinLength)
-			decoded, ok := ie.Decode(encoded)
-			if !ok || i != decoded {
-				fmt.Println("Something is weird:", i, encoded, decoded)
+			encoded, err := ie.Encode(i, idencoder.MinLength)
+			if err != nil {
+				fmt.Println("Something is weird (encode):", i, encoded)
+				break
+			}
+			decoded, err := ie.Decode(encoded)
+			if err != nil || i != decoded {
+				fmt.Println("Something is weird (decode):", i, encoded, decoded, err)
 				break
 			}
 		}
