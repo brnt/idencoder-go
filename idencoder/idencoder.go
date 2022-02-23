@@ -90,7 +90,6 @@ func (e *IdEncoderError) Error() string {
 
 // Encode converts an integer to a unique string, using the parameters contianed in the IdEncoder
 func (i *IdEncoder) Encode(n, minLength uint64) (encoded string, err error) {
-
 	return string(i.checksum(n)) + i.enbase(i.scramble(n), minLength), nil
 }
 
